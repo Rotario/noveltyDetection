@@ -5,7 +5,7 @@ void setup(){
 	while(!Serial);
 
 	Serial.print("Reading model from SD Card into EEPROM...");
-
+	//Default filenames are "svm.mod" and "svm.par" for the model and parameter files, respectively
 	if (SVM_readModelFromSD(SVM_MODEL_FILENAME, SVM_SCALE_PARAMETERS_FILENAME) != 0){
 		Serial.println("failed");
 	} else {
