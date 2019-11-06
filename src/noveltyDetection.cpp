@@ -83,6 +83,7 @@ inline float SVM_rbfKernel(uint16_t startAddr, float* v, uint8_t vecDims, float 
   return exp(-gamma * result);
 }
 
+//TODO: Support ESP8266 (and maybe others) with Precompiler-controlled EEPROM.ommit()
 //TODO: make another function to read from JSON and send as JSON from memory
 //TODO: nok if model not read
 //Todo: more checks eg n svs = no of updates addresses, n vec dikms are asll same #9first + last)

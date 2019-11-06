@@ -1,7 +1,6 @@
 #ifndef NOVELTY_DETECTION_H
 #define NOVELT_DETECTION_H
 
-#include <stdint.h>
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <SD.h>

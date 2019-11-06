@@ -1,0 +1,2 @@
+SVM_readModelFromSD	KEYWORD2
+SVM_predictEEPROM	KEYWORD2
