@@ -25,5 +25,6 @@ if (ret > 0) {
     Serial.println("Novelty");
     recognisedClass = -1;
   }
+delay(1000);
 }
 
