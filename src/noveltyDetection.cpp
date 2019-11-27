@@ -1,6 +1,15 @@
+/*
+  noveltyDetection.cpp - Library for running SVM 
+  classification algorithms given an SVM model on SD
+  card or SPIFFS.
+  Created by Rowan Easter-Robinson, August 23, 2018.
+  Released into the public domain.
+*/
+
+#include <Arduino.h>
 #include "noveltyDetection.h"
 
-inline float SVM_predictEEPROM(float* sensor, uint8_t nSensor) {
+float SVM_predictEEPROM(float* sensor, uint8_t nSensor) {
   int i;
   int recognizedClass = 1;
   

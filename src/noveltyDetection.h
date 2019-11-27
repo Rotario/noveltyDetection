@@ -1,5 +1,13 @@
+/*
+  noveltyDetection.h - Library for running SVM 
+  classification algorithms given an SVM model on SD
+  card or SPIFFS.
+  Created by Rowan Easter-Robinson, August 23, 2018.
+  Released into the public domain.
+*/
+
 #ifndef NOVELTY_DETECTION_H
-#define NOVELT_DETECTION_H
+#define NOVELTY_DETECTION_H
 
 #include <Arduino.h>
 #include <EEPROM.h>
@@ -30,19 +38,20 @@ enum eepromAddresses {
   aSVM_SV_END = 2000,
 };
 
+const int maxSVs = (aSVM_SV_END - aSVM_SV_START) / sizeof(float);
+
 //Std scale params, these are recommended by LIBSVM
 const int scalePar[] = { -1, 1};
 
-inline float SVM_predictEEPROM(float*, uint8_t);
+float SVM_predictEEPROM(float* sensor, uint8_t nSensor);
 
-void SVM_scaleEEPROM(const float*, float*, uint8_t, eepromAddresses);
+void SVM_scaleEEPROM(const float* sensor, float* scaledSensor, uint8_t vecDim, eepromAddresses eepromAddr);
 
-int SVM_readModelFromSD(const char *, const char *);
+int SVM_readModelFromSD(const char * modelFile, const char * scaleParamsFile);
 
-inline float SVM_rbfKernel(uint16_t, float*, uint8_t, float);
+inline float SVM_rbfKernel(uint16_t startAddr, float* v, uint8_t vecDims, float gamma);
 
-void readToCharCode(File*, char, int, char *);
+void readToCharCode(File * f, char c, int bufSize, char * buf);
 
-const int maxSVs = (aSVM_SV_END - aSVM_SV_START) / sizeof(float);
 
 #endif
