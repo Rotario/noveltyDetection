@@ -10,12 +10,22 @@
 #define NOVELTY_DETECTION_H
 
 #include <Arduino.h>
-#include <EEPROM.h>
-#include <SD.h>
 
-//Used to read the right file from the SD Card
-#define SVM_MODEL_FILENAME "svm.mod"
-#define SVM_SCALE_PARAMETERS_FILENAME "svm.par"
+#ifdef ARDUINO_ARCH_ESP8266
+  //FS uses SPIFFS, all filenames must start with /
+  #define SVM_MODEL_FILENAME "/svm.mod"
+  #define SVM_SCALE_PARAMETERS_FILENAME "/svm.par"
+  #include <FS.h>
+#else
+  //Used to read the right file from the SD Card
+  #define SVM_MODEL_FILENAME "svm.mod"
+  #define SVM_SCALE_PARAMETERS_FILENAME "svm.par"
+  #include <SD.h>
+#endif
+
+#include <EEPROM.h>
+
+
 //Max number of features
 #define SVM_MAX_VEC_DIM 10
 //Used for checking the files on SD have the correct params
@@ -48,6 +58,8 @@ float SVM_predictEEPROM(float* sensor, uint8_t nSensor);
 void SVM_scaleEEPROM(const float* sensor, float* scaledSensor, uint8_t vecDim, eepromAddresses eepromAddr);
 
 int SVM_readModelFromSD(const char * modelFile, const char * scaleParamsFile);
+
+int SVM_readModelFromSPIFFS(const char * modelFile, const char * scaleParamsFile);
 
 inline float SVM_rbfKernel(uint16_t startAddr, float* v, uint8_t vecDims, float gamma);
 
