@@ -306,7 +306,11 @@ int SVM_readModelFromSPIFFS(const char * modelFile, const char * scaleParamsFile
     if (f) {
       Serial.println(F("success"));
       while (f.available()) {
-        readToCharCode(&f, 0x0A, SD_BUF_LENGTH, sdBuf); //Fill messagebuffer with file until newline LF
+        readToCharCode(&f, 0x0D, SD_BUF_LENGTH, sdBuf); //Fill messagebuffer with file until LF
+        if (f.peek() == 0x0A){
+          Serial.println("dumping out LF if exists");
+          f.read();
+        }
         pch = strtok(sdBuf, " "); //Split into spaces
         if (pch != NULL) {
           if (strcmp("svm_type", pch) == 0 ) {
