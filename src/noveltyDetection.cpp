@@ -365,14 +365,19 @@ int SVM_readModelFromSPIFFS(const char * modelFile, const char * scaleParamsFile
             Serial.println(F("Found SV"));
             //iterate through number of SVs, writing to eeprom each time
             for (i = 0; i < svm.totalSVs; i++) {
-              readToCharCode(&f, 0x0A, SD_BUF_LENGTH, sdBuf); //Fill messagebuffer with file until newline CR found, dump out LF
+              readToCharCode(&f, 0x0D, SD_BUF_LENGTH, sdBuf); //Fill messagebuffer with file until newline CR found, dump out LF
+              if (f.peek() == 0x0A){
+                Serial.println("dumping out LF if exists");
+                f.read();
+              }
+                //dump out LF
               if (i == maxSVs) {
                 Serial.print(F("Too many support vectors"));
                 f.close();
                 return -1; //Check address not greater than max reserved
               }
 
-              pch = strtok(sdBuf, " :");
+              pch = strtok(sdBuf, " ");
               Serial.print(F("SV Weighting: "));
 	            Serial.println(atof(pch));
               //Calc EEPROM address and cast parsed value to float from double
@@ -381,12 +386,13 @@ int SVM_readModelFromSPIFFS(const char * modelFile, const char * scaleParamsFile
 	            Serial.println(startAddr);
               EEPROM.put(startAddr, (float) atof(pch)); //write weighting to address, //Cast to float as atof returns double
               pch = strtok(NULL, " :");
-              while (pch != NULL) {
+              while (pch) {
                 //Iterate through number of dimensions
                 Serial.print(F("Dim number: "));
 		            Serial.println(atoi(pch));
                 svm.nVecDims = atoi(pch);
                 if (svm.nVecDims >= SVM_MAX_VEC_DIM) {
+                  Serial.println(F("No of dimensions greater than max defined in SVM_MAX_VEC_DIM"));
                   f.close();
                   return -1;
                 }
@@ -426,39 +432,50 @@ int SVM_readModelFromSPIFFS(const char * modelFile, const char * scaleParamsFile
     if (f) {
       Serial.println(F("success"));
       while (f.available()) {
-        readToCharCode(&f, 0x0A, SD_BUF_LENGTH, sdBuf); //Fill messagebuffer with file until LF
+        readToCharCode(&f, 0x0D, SD_BUF_LENGTH, sdBuf); //Fill messagebuffer with file until LF
+        if (f.peek() == 0x0A){
+          Serial.println("dumping out LF if exists");
+          f.read();
+        }
         pch = strtok(sdBuf, " "); //Split into spaces
         if (pch != NULL) {
           if (strcmp("x", pch) == 0 ) { //Always last data in file
             //EEPROM writes inside the reading loop because if there's a problem it'll return before this always
             Serial.println(F("Found x"));
             //iterate through number of SVs, writing to eeprom each time
-            readToCharCode(&f, 0x0A, SD_BUF_LENGTH, sdBuf); //Fill messagebuffer with file until newline CR found, dump out LF
+            readToCharCode(&f, 0x0D, SD_BUF_LENGTH, sdBuf); //Fill messagebuffer with file until LF
+            if (f.peek() == 0x0A){
+              Serial.println("dumping out LF if exists");
+              f.read();
+            } 
             pch = strtok(sdBuf, " ");
             Serial.print(F("Scale Lower Value: "));
-	    Serial.println(atof(pch));
+	          Serial.println(atof(pch));
             pch = strtok(NULL, " ");
             Serial.print(F("Scale Upper Value: "));
-	    Serial.print(atof(pch));
+	          Serial.print(atof(pch));
 
             for (i = 0; i < svm.nVecDims; i++) { //should always be less than 10. if not then never gets to this point, returns in svm.mod file parsing stage
-              readToCharCode(&f, 0x0A, SD_BUF_LENGTH, sdBuf); //Fill messagebuffer with file until LF
-
+              readToCharCode(&f, 0x0D, SD_BUF_LENGTH, sdBuf); //Fill messagebuffer with file until LF
+              if (f.peek() == 0x0A){
+                Serial.println("dumping out LF if exists");
+                f.read();
+              }
               //Calc EEPROM address and cast parsed value to float from double
               int startAddr = aSVM_SCALE_PARAMS_START + (i * (2 * sizeof(float))); //init start address for this loop, 2 values for every vector dimension
-              //Serial.printf("Start address for this loop = %i\t", startAddr);
+              Serial.printf("Start address for this loop = %i\t", startAddr);
               pch = strtok(sdBuf, " ");
               //Iterate through number of dimensions
-              //Serial.printf("Dim number: %i\t", atoi(pch));
+              Serial.printf("Dim number: %i\t", atoi(pch));
 
               pch = strtok(NULL, " "); //read out dimension SV number (To next : )
-              //Serial.printf("Addr = %i \t", startAddr);
-              //Serial.printf("Lower value = %f\t", (float) atof(pch)); //Cast to float as atof returns double
+              Serial.printf("Addr = %i \t", startAddr);
+              Serial.printf("Lower value = %f\t", (float) atof(pch)); //Cast to float as atof returns double
               EEPROM.put(startAddr, (float) atof(pch));
 
               pch = strtok(NULL, " "); //read out dimension SV value (To next SPACE (0x20))
-              //Serial.printf("Addr = %i \t", startAddr + 1 * sizeof(float));
-              //Serial.printf("Upper Value value = %f\t", (float) atof(pch)); //Cast to float as atof returns double
+              Serial.printf("Addr = %i \t", startAddr + 1 * sizeof(float));
+              Serial.printf("Upper Value value = %f\t", (float) atof(pch)); //Cast to float as atof returns double
               EEPROM.put(startAddr + sizeof(float), (float) atof(pch));
 
               Serial.println();
