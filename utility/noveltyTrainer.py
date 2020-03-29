@@ -144,7 +144,7 @@ def readCSV(file_path):
     try:
         df = pd.read_csv(file_path, header=None)
         if isIndex(df.iloc[:,0]):
-            df.drop(columns=0)
+            df = df.drop(columns=0)
         train = df.to_numpy()
     except Exception as e:
         raise Exception(e)
